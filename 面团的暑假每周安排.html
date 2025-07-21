@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宝贝的每周任务表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            background-color: #fdf8f0; /* 温暖的米白色背景 */
+        }
+        .zcool-font {
+            font-family: 'ZCOOL KuaiLe', cursive;
+        }
+        .task-table th, .task-table td {
+            border: 2px dashed #fcd34d; /* 黄色虚线边框 */
+            padding: 12px;
+            text-align: center;
+        }
+        .task-table th {
+            background-color: #fef3c7; /* 淡黄色表头 */
+            font-size: 1.25rem;
+            color: #ca8a04;
+        }
+        .task-category-header {
+            font-size: 1.1rem;
+            color: #78350f;
+            text-align: left;
+            padding-top: 1rem;
+            padding-bottom: 0.5rem;
+        }
+        .task-name-cell {
+            text-align: left;
+            width: 40%;
+            color: #451a03;
+        }
+        .checkmark-cell {
+            cursor: pointer;
+            transition: background-color 0.3s;
+            position: relative;
+            min-width: 60px;
+        }
+        .checkmark-cell:hover {
+            background-color: #fef9c3;
+        }
+        .checkmark-cell .check-icon {
+            display: none;
+            color: #22c55e; /* 绿色对勾 */
+            width: 32px;
+            height: 32px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .checkmark-cell.checked .check-icon {
+            display: block;
+        }
+        .eye-icon, .rest-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-right: 8px;
+            color: #fb923c;
+        }
+        .eye-icon svg, .rest-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+
+        <!-- 标题 -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl sm:text-5xl font-bold text-amber-600 zcool-font tracking-wider">宝贝的每周任务表</h1>
+            <p class="text-lg text-orange-400 mt-2 zcool-font">新的一周，也要元气满满哦！</p>
+        </header>
+
+        <!-- 任务表格 -->
+        <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+            <table id="task-table" class="w-full border-collapse task-table">
+                <thead>
+                    <tr>
+                        <th class="rounded-tl-xl">任务清单</th>
+                        <th>周一</th>
+                        <th>周二</th>
+                        <th>周三</th>
+                        <th>周四</th>
+                        <th class="rounded-tr-xl">周五</th>
+                    </tr>
+                </thead>
+                <tbody id="task-body">
+                    <!-- JS 动态生成任务行 -->
+                </tbody>
+            </table>
+        </div>
+         <footer class="text-center mt-6">
+            <button id="reset-button" class="bg-rose-400 hover:bg-rose-500 text-white zcool-font py-2 px-6 rounded-full shadow-md transition-transform transform hover:scale-105">清空所有勾选</button>
+        </footer>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const taskData = [
+            {
+                category: "一般用眼",
+                iconType: "two-eyes",
+                tasks: ["暑假生活", "硬笔书法", "数学计算"]
+            },
+            {
+                category: "轻微用眼",
+                iconType: "one-eye",
+                tasks: ["晨读", "阅读小说"]
+            },
+            {
+                category: "手机屏幕",
+                iconType: "three-eyes",
+                tasks: ["B站语文课", "speak英语", "anki默写"]
+            },
+            {
+                category: "放松休息",
+                iconType: "rest",
+                tasks: ["听歌", "听英语课文", "听B站语文课", "听拓展知识", "体育运动", "宠物逗乐", "其他娱乐"]
+            }
+        ];
+
+        const icons = {
+            'one-eye': `<span class="eye-icon" title="轻微用眼"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg></span>`,
+            'two-eyes': `<span class="eye-icon" title="一般用眼"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg></span>`,
+            'three-eyes': `<span class="eye-icon" title="使用手机屏幕"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg></span>`,
+            'rest': `<span class="rest-icon" title="放松休息"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></span>`
+        };
+        
+        const checkIconSvg = `<svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>`;
+
+        const taskBody = document.getElementById('task-body');
+        let checkedCells = JSON.parse(localStorage.getItem('weeklyTaskChecks')) || [];
+
+        function renderTable() {
+            taskBody.innerHTML = ''; // 清空表格
+            taskData.forEach(category => {
+                // 添加分类标题行
+                const categoryRow = `<tr><td colspan="6" class="task-category-header zcool-font">${category.category}</td></tr>`;
+                taskBody.insertAdjacentHTML('beforeend', categoryRow);
+
+                // 添加该分类下的任务行
+                category.tasks.forEach((taskName, taskIndex) => {
+                    const row = document.createElement('tr');
+                    let cells = `<td class="task-name-cell zcool-font">${icons[category.iconType]} ${taskName}</td>`;
+                    for (let day = 1; day <= 5; day++) {
+                        const cellId = `${category.iconType}-${taskIndex}-day${day}`;
+                        const isChecked = checkedCells.includes(cellId);
+                        cells += `<td class="checkmark-cell ${isChecked ? 'checked' : ''}" data-id="${cellId}">${checkIconSvg}</td>`;
+                    }
+                    row.innerHTML = cells;
+                    taskBody.appendChild(row);
+                });
+            });
+        }
+        
+        function updateStorage() {
+            localStorage.setItem('weeklyTaskChecks', JSON.stringify(checkedCells));
+        }
+
+        taskBody.addEventListener('click', function(e) {
+            const cell = e.target.closest('.checkmark-cell');
+            if (!cell) return;
+
+            const cellId = cell.dataset.id;
+            cell.classList.toggle('checked');
+            
+            if (cell.classList.contains('checked')) {
+                if (!checkedCells.includes(cellId)) {
+                    checkedCells.push(cellId);
+                }
+            } else {
+                checkedCells = checkedCells.filter(id => id !== cellId);
+            }
+            updateStorage();
+        });
+
+        document.getElementById('reset-button').addEventListener('click', function() {
+            if (confirm('确定要清空所有勾选记录吗？')) {
+                checkedCells = [];
+                updateStorage();
+                renderTable();
+            }
+        });
+
+        renderTable();
+    });
+    </script>
+</body>
+</html>
